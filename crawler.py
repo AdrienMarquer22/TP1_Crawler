@@ -16,7 +16,7 @@ class Crawler():
         self.limit = limit
         self.output = output
 
-    def run(self):
+    def run_loop(self):
         page = requests.get(self.url)
         soup = BeautifulSoup(page.content, 'html.parser')
         links = [link.get('href') for link in soup.find_all('a')]
@@ -35,16 +35,22 @@ class Crawler():
 
             except:
                 pass
+        return self.output
 
+        
+
+    def run(self):
+        self.output=self.run_loop()
         if len(self.output) == self.limit :
                 return self.output
         else : 
             for elem in self.output:
                 time.sleep(5)
                 Crawler_bis=Crawler(elem,self.limit,self.output)
-                self.output=Crawler_bis.run()
+                self.output=Crawler_bis.run_loop()
                 if len(self.output) == self.limit :
                     return self.output
+
 
 
     def get_output(self):
