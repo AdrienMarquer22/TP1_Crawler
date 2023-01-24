@@ -35,7 +35,7 @@ The `Crawler` class is a web crawler that can be used to scrape links and other 
 
 The `__init__` method initializes the class with a URL, a limit for the number of links to retrieve, and an output list. 
 
-The `run_loop` method then retrieves the page content from the URL and parses it to extract all of the links on the page. 
+The `crawl_page` method then retrieves the page content from the URL and parses it to extract all of the links on the page if we can crawl those link. 
 
 The `init_robot` method checks whether a robots.txt file exists for the website and, if it does, reads it to determine which links the crawler is allowed to access.
 

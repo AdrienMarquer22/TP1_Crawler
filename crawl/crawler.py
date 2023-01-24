@@ -7,6 +7,7 @@ import socket
 from datetime import datetime
 import csv
 from crawl.database import Database
+import concurrent.futures
 # If an url take too much time too load
 socket.setdefaulttimeout(2)
 
@@ -20,8 +21,9 @@ class Crawler():
         self.limit = limit
         self.output = output
 
-    def run_loop(self):
-        page = requests.get(self.url)
+    def crawl_page(self,url):
+        print(url,len(self.output))
+        page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
         links = [link.get('href') for link in soup.find_all('a')]
         for l in links : 
@@ -33,7 +35,6 @@ class Crawler():
         return self.output
 
     def init_robot(self,url):
-        
         rp = RobotFileParser()
         try: ## try If the result is not an url 
             rp.set_url(urlparse(url).scheme + "://" + urlparse(url).hostname + "/robots.txt")
@@ -49,16 +50,16 @@ class Crawler():
 
     def run(self):
         self.last_mod=False #We dont have the last modification time n this case
-        self.output=self.run_loop()
+        self.output=self.crawl_page(url=self.url)
         if len(self.output) == self.limit :
                 return self.output
         else : 
             for elem in self.output:
                 time.sleep(5)
-                Crawler_bis=Crawler(elem,self.limit,self.output)
-                self.output=Crawler_bis.run_loop()
+                self.crawl_page(url=elem[0])
                 if len(self.output) == self.limit :
                     return self.output
+            self.run()
 
 
 
@@ -124,3 +125,23 @@ class Crawler():
     
     def set_limit(self,limit):
         self.limit = limit
+
+    def run_multi(self, max_threads=3):
+        self.last_mod=False
+        self.output=self.crawl_page(self.url)
+        nostop=True
+        i=0
+        if len(self.output) >= self.limit :
+            return self.output
+        else : 
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_threads) as executor :
+                future_crawlers = [executor.submit(self.crawl_page, elem[0]) for elem in self.output]
+                for future in concurrent.futures.as_completed(future_crawlers):
+                    print('tt',len(self.output))
+                    if len(self.output) >= self.limit:
+                        executor.shutdown(wait=False)
+                        break
+                    else:
+                        future.result()
+                        time.sleep(5)
+                        

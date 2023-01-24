@@ -33,7 +33,7 @@ if __name__=="__main__":
 
     base= Database(args.save_base)
     base.init_tabe(args.save_table)
-    crawler.save_html_in_db(base,"Crawler")
+    crawler.save_html_in_db(base,args.save_table)
 
 
 
