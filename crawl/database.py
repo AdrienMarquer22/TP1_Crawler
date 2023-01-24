@@ -1,6 +1,5 @@
 import sqlite3
-import csv
-import requests
+
 
 
 class Database():

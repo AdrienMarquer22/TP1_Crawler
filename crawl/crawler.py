@@ -6,8 +6,10 @@ from urllib.robotparser import RobotFileParser
 import socket
 from datetime import datetime
 import csv
-from database import Database
-socket.setdefaulttimeout(1) # If an url take too much time too load
+from crawl.database import Database
+# If an url take too much time too load
+socket.setdefaulttimeout(2)
+
 
 
 
@@ -79,7 +81,7 @@ class Crawler():
                         return self.output
             return self.output
         else:
-            print("sitemap.xml not found")
+            raise Exception("sitemap.xml not found")
 
 
     def save_html_in_db(self,db:Database,name_table):
@@ -109,7 +111,7 @@ class Crawler():
     def reset(self):
         self.output=[]
 
-    def save(self,name):
+    def save(self,name="crawled_webpages"):
         with open(name+".csv", 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerows(self.output)
