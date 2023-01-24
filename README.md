@@ -12,12 +12,20 @@ pip install -r requirements.txt
 ## Usage
 
 There is 4 arguments to use :
+
     - `--url` : That take the url thaht you want to crawl
+    
     - `--limit` : The limit of pages thaht we want to crawl (`default=50`)
+    
     - `--save_csv` : Put the name for the csv (`defaul="crawled_wepages"`)
+    
     - `--save_base` : Put the name for the database (`defaul="TP_Crawler"`)
+    
     - `--save_table` : Put the name for the table in database (`defaul="Crawler"`)
+    
     - `--sitemap` : If set we willuse the sitemap.xml to crawl
+
+
 
 ```bash
 python3 main.py --url https://www.ensai.fr/ --limit 15 --save crawled_webpages
