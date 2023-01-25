@@ -126,7 +126,8 @@ class Crawler():
     def set_limit(self,limit):
         self.limit = limit
 
-    def run_multi(self, max_threads=3):
+    def run_multi(self, max_threads=8):
+        stop=False
         self.last_mod=False
         self.output=self.crawl_page(self.url)
         if len(self.output) >= self.limit :
@@ -135,13 +136,32 @@ class Crawler():
             
             j=0
             while len(self.output) <= self.limit:
-                threads = []
-                for i in range(max_threads):
-                    t = MyThread(cr=self,url=self.output[j][0])
+                threads = [] 
+                website_in_threads=[]
+                for _ in range(max_threads):
+                    url = self.output[j][0]
+                    website = urlparse(url).scheme + "://" + urlparse(url).hostname
+                    if  website in website_in_threads: # to make sure that we dont crawl a page from the same website at once so if website already in the list then we find the closest website that is not in the list 
+                        for i in range(j,len(self.output)):
+                            website_bis = urlparse(self.output[i][0]).scheme + "://" + urlparse(self.output[i][0]).hostname
+                            if website_bis not in website_in_threads:
+                                url_bis=url
+                                url=self.output[i][0]
+                                self.output[i][0]=url_bis
+                                break
+                            if i == len(self.output)-1 : # in case we reach the end of the list
+                                stop=True
+            
+                        
+                    if stop:
+                        break
+                    t = MyThread(cr=self,url=url)
                     j+=1
                     t.start()
                     threads.append(t)
-
+                    website_in_threads.append(urlparse(url).scheme + "://" + urlparse(url).hostname)
+                    print(website_in_threads)
+                     
                 for t in threads:
                     t.join()
                 time.sleep(5)
