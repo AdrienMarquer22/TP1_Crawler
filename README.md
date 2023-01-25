@@ -22,7 +22,7 @@ python3 main.py --url url
                 [--multithread]
                 [--nobase]
 ```
-There is 6 arguments to use :
+There is 8 arguments to use :
 
 - `--url` : That take the url thaht you want to crawl
 - `--limit` : The limit of pages thaht we want to crawl (`default=50`)
