@@ -8,6 +8,7 @@ from datetime import datetime
 import csv
 from crawl.database import Database
 import concurrent.futures
+from crawl.thread import MyThread
 # If an url take too much time too load
 socket.setdefaulttimeout(2)
 
@@ -129,19 +130,21 @@ class Crawler():
     def run_multi(self, max_threads=3):
         self.last_mod=False
         self.output=self.crawl_page(self.url)
-        nostop=True
-        i=0
         if len(self.output) >= self.limit :
             return self.output
         else : 
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_threads) as executor :
-                future_crawlers = [executor.submit(self.crawl_page, elem[0]) for elem in self.output]
-                for future in concurrent.futures.as_completed(future_crawlers):
-                    print('tt',len(self.output))
-                    if len(self.output) >= self.limit:
-                        executor.shutdown(wait=False)
-                        break
-                    else:
-                        future.result()
-                        time.sleep(5)
-                        
+            
+            j=0
+            while len(self.output) <= self.limit:
+                threads = []
+                for i in range(max_threads):
+                    print("tt   t",self.output[j][0])
+                    t = MyThread(cr=self,url=self.output[j][0])
+                    j+=1
+                    t.start()
+                    threads.append(t)
+
+                for t in threads:
+                    t.join()
+                time.sleep(5)
+        self.output=self.output[0:self.limit]

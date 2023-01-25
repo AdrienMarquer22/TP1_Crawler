@@ -16,6 +16,10 @@ if __name__=="__main__":
 
     parser.add_argument('--sitemap', action='store_true',default=False)
 
+    parser.add_argument('--multithread', action='store_true',default=False)
+
+    parser.add_argument('--nobase', action='store_false',default=True)
+
 
 
     args = parser.parse_args()
@@ -24,16 +28,18 @@ if __name__=="__main__":
 
     if args.sitemap:
         crawler.site_map()
+    elif args.multithread:
+        crawler.run_multi()
     else:
         crawler.run()
 
-    crawler.save(args.save)
+    crawler.save(args.save_csv)
 
     
-
-    base= Database(args.save_base)
-    base.init_tabe(args.save_table)
-    crawler.save_html_in_db(base,args.save_table)
+    if args.nobase :
+        base= Database(args.save_base)
+        base.init_tabe(args.save_table)
+        crawler.save_html_in_db(base,args.save_table)
 
 
 

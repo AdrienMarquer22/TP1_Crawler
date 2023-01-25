@@ -11,22 +11,37 @@ pip install -r requirements.txt
 
 ## Usage
 
-There is 4 arguments to use :
+Launch with the command 
+```bash
+python3 main.py --url url 
+                [--limit limit]
+                [--save_csv name]
+                [--save_base name]
+                [--save_table name]
+                [--sitemap]
+                [--multithread]
+                [--nobase]
+```
+There is 6 arguments to use :
 
 - `--url` : That take the url thaht you want to crawl
 - `--limit` : The limit of pages thaht we want to crawl (`default=50`)
 - `--save_csv` : Put the name for the csv (`defaul="crawled_wepages"`)
 - `--save_base` : Put the name for the database (`defaul="TP_Crawler"`)
 - `--save_table` : Put the name for the table in database (`defaul="Crawler"`)
-- `--sitemap` : If set we will use the sitemap.xml to crawl
-
+- `--sitemap` : If set we will use the sitemap.xml to crawl (`default=False`)
+- `--multithread` : If set we will use a multithreading to crawl (`default=False`)
+- `--nobase` : For desactivae the creation of the database (`default=False`)
 
 
 ```bash
-python3 main.py --url https://www.ensai.fr/ --limit 15 --save crawled_webpages
+python3 main.py --url https://www.ensai.fr/ --limit 50 --save_csv crawled_webpages
 
 # With sitemap : 
-python3 main.py --url https://www.ensai.fr/ --limit 25 --sitemap
+python3 main.py --url https://www.ensai.fr/ --limit 75 --save_csv crawled_webpages_sitemap --sitemap --nobase
+
+# With multithreading : 
+python3 main.py --url https://www.ensai.fr/ --limit 300 --save_csv crawled_webpages_multithreading --multithread --nobase
 ```
 
 
@@ -45,6 +60,8 @@ The `init_robot` method checks whether a robots.txt file exists for the website 
 The `run` method then iterates through the list of links and, for each one, calls the `run_loop` method again to extract any additional links. If the limit for the number of links is reached, the method returns the output list.
 
 The `site_map` method retrieves the sitemap for the website, if one exists, and extracts the links and last modification dates for each page. 
+
+The `run_multi` method crawl the pages in multithreading. 
 
 The `save_html_in_db` method can be used to save the HTML content of the pages in a database. If the last modification date has already been extracted, it is included in the database along with the URL and HTML content.Otherwise, it scans the meta of the page to find the date. 
 
