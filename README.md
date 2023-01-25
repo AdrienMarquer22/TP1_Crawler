@@ -61,7 +61,7 @@ The `run` method then iterates through the list of links and, for each one, call
 
 The `site_map` method retrieves the sitemap for the website, if one exists, and extracts the links and last modification dates for each page. 
 
-The `run_multi` method crawl the pages in multithreading. 
+The `run_multi` method crawl the pages in multithreading. For the multithreading we create a list of 5 pages that come from different website and we crawl each pages in a different thread.
 
 The `save_html_in_db` method can be used to save the HTML content of the pages in a database. If the last modification date has already been extracted, it is included in the database along with the URL and HTML content.Otherwise, it scans the meta of the page to find the date. 
 

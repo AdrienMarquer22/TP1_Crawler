@@ -126,7 +126,7 @@ class Crawler():
     def set_limit(self,limit):
         self.limit = limit
 
-    def run_multi(self, max_threads=8):
+    def run_multi(self, max_threads=5):
         stop=False
         self.last_mod=False
         self.output=self.crawl_page(self.url)
