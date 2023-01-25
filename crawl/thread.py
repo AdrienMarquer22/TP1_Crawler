@@ -8,6 +8,5 @@ class MyThread(threading.Thread):
         self.url = url
 
     def run(self):
-        print(self.url)
         if len(self.cr.output) <= self.cr.limit:
             self.cr.crawl_page(self.url)

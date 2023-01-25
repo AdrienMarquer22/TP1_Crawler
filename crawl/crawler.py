@@ -23,7 +23,6 @@ class Crawler():
         self.output = output
 
     def crawl_page(self,url):
-        print(url,len(self.output))
         page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
         links = [link.get('href') for link in soup.find_all('a')]
@@ -138,7 +137,6 @@ class Crawler():
             while len(self.output) <= self.limit:
                 threads = []
                 for i in range(max_threads):
-                    print("tt   t",self.output[j][0])
                     t = MyThread(cr=self,url=self.output[j][0])
                     j+=1
                     t.start()
