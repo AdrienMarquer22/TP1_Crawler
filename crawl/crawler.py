@@ -160,7 +160,7 @@ class Crawler():
                     t.start()
                     threads.append(t)
                     website_in_threads.append(urlparse(url).scheme + "://" + urlparse(url).hostname)
-                    print(website_in_threads)
+                    
                      
                 for t in threads:
                     t.join()
