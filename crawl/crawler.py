@@ -7,7 +7,6 @@ import socket
 from datetime import datetime
 import csv
 from crawl.database import Database
-import concurrent.futures
 from crawl.thread import MyThread
 # If an url take too much time too load
 socket.setdefaulttimeout(2)
@@ -21,9 +20,13 @@ class Crawler():
         self.url=url
         self.limit = limit
         self.output = output
+        self.robot_cache={}
 
     def crawl_page(self,url):
-        page = requests.get(url)
+        try: # if page don't load
+            page = requests.get(url,timeout=10)
+        except:
+            pass
         soup = BeautifulSoup(page.content, 'html.parser')
         links = [link.get('href') for link in soup.find_all('a')]
         for l in links : 
@@ -34,17 +37,23 @@ class Crawler():
                     return self.output
         return self.output
 
+
     def init_robot(self,url):
-        rp = RobotFileParser()
-        try: ## try If the result is not an url 
-            rp.set_url(urlparse(url).scheme + "://" + urlparse(url).hostname + "/robots.txt")
-            try : # try If the url didnt't load
-                rp.read()
-                return rp
-            except:
+        if url in self.robot_cache:
+            return self.robot_cache[url]
+        else:
+            rp = RobotFileParser()
+            try:## try If the result is not an url 
+                rp.set_url(urlparse(url).scheme + "://" + urlparse(url).hostname + "/robots.txt")
+                try: # try If the url didnt't load
+                    rp.read()
+                    self.robot_cache[url] = rp
+                    return rp
+                except:
                     return False
-        except:
-            return False
+            except:
+                return False
+
 
         
 
@@ -94,19 +103,20 @@ class Crawler():
         else:
             for elem in self.output:
                 time.sleep(5)
-                page = requests.get(elem[0])
-                soup = BeautifulSoup(page.content, features="html.parser")
-                try:
-                    lastmod=soup.find("meta", {"property":"article:modified_time"}).get('content')
-                    lastmod_datetime = datetime.strptime(lastmod, "%Y-%m-%dT%H:%M:%S+00:00")
-                    lastmod_datetime_str = lastmod_datetime.strftime("%m/%d/%Y, %H:%M:%S")
+                try: # try if page load
+                    page = requests.get(elem[0],timeout=5)
+                    soup = BeautifulSoup(page.content, features="html.parser")
+                    try: # try if we find a date
+                        lastmod=soup.find("meta", {"property":"article:modified_time"}).get('content')
+                        lastmod_datetime = datetime.strptime(lastmod, "%Y-%m-%dT%H:%M:%S+00:00")
+                        lastmod_datetime_str = lastmod_datetime.strftime("%m/%d/%Y, %H:%M:%S")
+                    except:
+                        lastmod_datetime_str ='NaN'
+                    db.insert(name_table,[elem[0],lastmod_datetime_str,page.text])
+                    db.commit()
                 except:
-                    lastmod_datetime_str ='NaN'
-                
-                db.insert(name_table,[elem[0],lastmod_datetime_str,page.text])
-                db.commit()
+                    pass
 
-            pass
             
 
     def reset(self):
